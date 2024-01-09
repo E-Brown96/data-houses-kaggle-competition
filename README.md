@@ -30,26 +30,20 @@ The objective of this task was to analyse the dataset provided by kaggle. The ju
 <h5>Loading the dataset</h5>
 This dataset was already split into train and test and just had to be loading from a csv file.
 
-<h5>Splitting the dataset</h5>
-Next the larger (non-test) dataset was split into a train and validation set.
+<h5>Initial data cleaning</h5>
+To generate a baseline score some basic data cleaning and processing was performed including; numerical and categorical features were split. Then the numerical features were accessed for correlation using a seaborn heatmap and those with a correlation greater than 0.7 were excluded. For categorgircal variables any variable with other 7 unique values was removed and the rest were one-hot-encoded.
 
-<h5>Preprocessing the data</h5>
-In a previous challenge we had created a pipeline which did the following:
-- For numerical values a KNNImputer was used followed by a MinMaxScaler
-- For all categorical values a simple imputer was used
-- The values were then split with some being ordinal encoded and others being one hot encoded
-- Finally these categorical (now numerical) values were scaled using the MinMaxScaler
+<h5>Building a pipeline</h5>
+Following the initial clean up of the data a pipeline was constructed. The numerical data was imputed using the mean strategy of the simple imputer and then scaled using the MinMaxScaler. The categorical values were one-hot encoded and imputer with the most frequent value. Both were put into a column transformer to form the final preprocessing pipeline.
 
-As this was done in a previous challenge the pipeline in this notebook was imported and fitted to the X_train and y_train values. It was then used to transform the X_train, y_train and X_val datasets. 
+<h5>Baseline model</h5>
+Upon completion of the initial preprocessing pipeline a baseline model was generated using this pipeline and a Decision Tree Regressor model from sklearn. To score the model kaggle required the use of the root mean squared log error, which is not readily available as a metric so a function was created to determine the score.
 
-<h5>Predictions using Tensorflow/Keras</h5>
-Once the data was prepared a regression could be performed on the dataset using the Keras library. The metric used to measure the model was specified on Kaggle as the RMSLE (root mean square log error). 
+<h5>Improving the model</h5>
+A number of iterations were performed on the data to try and improve the score of the model including:
+- Ordinal encoding some of the categorical features and adding this to the pipeline
+- Using Univariate, multivariate and variance threshold to help eliminate features that were causing the model to overfit and did not help predict the target.
+- Custom functions were added to remove correlated features and to convert the time in months to a cyclical feature using sine and cosine
 
-The instantiated model was a Sequential model and 12 different layers were used, these were all dense layers with relu chosen as the activation. As it was a linear regression for the final layer linear was chosen as the activation.
-
-The model was then compiled using the adam optimser a loss measured using msle and the metrics chosen as msle.
-
-The model was fit using a batch size of 32 and 150 epochs, then the results were evaluted (Note the loss and metric variables were square rooted to get the rmsle). The history of the loss was also plotted against the number of epochs for train and validation to get a sense as to whether the model was overfitting or underfitting. 
-
-<h5>Submitting to Kaggle</h5>
-To submit my final model results to kaggle, the model predicted the values of y using X_test then a results dataframe was created and exported to a csv file which could then be uploaded to kaggle. 
+<h5>Final model</h5>
+The final model was then saved to a csv file and this csv file uploaded to kaggle to determine the final score of the best model, which was 0.20.
